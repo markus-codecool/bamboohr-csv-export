@@ -1,6 +1,6 @@
 This extension is only used by Codecool Austria to use their timetracking more easily.
 
-How to install this extension
+## How to install this extension
 
 - Download this project from Github. There should be a green "Code" button with another button called "Download ZIP". Alternatively you can directly go to https://github.com/markus-codecool/bamboohr-csv-export/archive/refs/heads/master.zip 
 - Unzip this folder. Under windows you can right-click the .zip file and click "extract all". Choose a permanent location for the extracted files.
@@ -16,6 +16,7 @@ How to install this extension
 ![Extensions Page](/documentation/chrome_extensions_1.png)
 
 
+## How to use this extension
 Once the extension is up and running, you can start to use it.
 
 - Open up the desired timesheet page (should be under `https://codecool.bamboohr.com/employees/timesheet...`)
