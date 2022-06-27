@@ -150,8 +150,8 @@ function addWorkingButton() {
 }
 
 
-
-
-window.onload = function () {
+if (document.readyState !== 'complete') {
+    window.addEventListener('load', addWorkingButton);
+} else {
     addWorkingButton();
-};
+}

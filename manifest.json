@@ -2,7 +2,7 @@
   "name": "BambooHR Timesheet to Clipboard",
   "description": "On the timesheet page of BambooHR a button will be added to copy all time entries to the user's clipboard in a csv format.",
   "version": "1.0",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "content_scripts": [
     {
       "matches": ["https://codecool.bamboohr.com/employees/timesheet/*"],
@@ -10,7 +10,7 @@
     }
   ],
   "permissions": ["storage", "activeTab", "scripting"],
-  "action": {
+  "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "/images/bamboo_extension16.png",
@@ -24,5 +24,10 @@
     "32": "/images/bamboo_extension32.png",
     "48": "/images/bamboo_extension48.png",
     "128": "/images/bamboo_extension128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{fb5f70e3-7950-483a-afb2-f0d39b764e7a}"
+    }
   }
 }
