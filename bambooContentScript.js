@@ -47,18 +47,17 @@ function subtractTimes(a, b) {
     return minsToStr(strToMins(a) - strToMins(b));
 }
 
-function fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement("textarea");
-    textArea.value = text;
+function copyHtmlToClipboard(html) {
+    var container = document.createElement("div");
+    container.innerHTML = html;
 
     // Avoid scrolling to bottom
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
+    container.style.top = "0";
+    container.style.left = "0";
+    container.style.position = "fixed";
 
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
+    document.body.appendChild(container);
+    window.getSelection().selectAllChildren(container);
 
     try {
         var successful = document.execCommand('copy');
@@ -68,19 +67,7 @@ function fallbackCopyTextToClipboard(text) {
         console.error('Fallback: Oops, unable to copy', err);
     }
 
-    document.body.removeChild(textArea);
-}
-
-function copyTextToClipboard(text) {
-    if (!navigator.clipboard) {
-        fallbackCopyTextToClipboard(text);
-        return;
-    }
-    navigator.clipboard.writeText(text).then(function() {
-        console.log('Async: Copying to clipboard was successful!');
-    }, function(err) {
-        console.error('Async: Could not copy text: ', err);
-    });
+    document.body.removeChild(container);
 }
 
 function main() {
@@ -89,7 +76,7 @@ function main() {
     let payPeriod = document.getElementsByClassName(payPeriodSelector)[0].getElementsByTagName('h4')[0].innerText.trim();
     let payPeriodMonth = payPeriod.split(' ')[0].trim();
     console.log('Pay period month:', payPeriodMonth);
-    let csvString = ''; // This string is the result of this function
+    let htmlString = '<table><tbody>'; // This string is the result of this function
 
     let entries = document.getElementsByClassName(dailyEntrySelector);
     for (let entry of entries) {
@@ -99,7 +86,7 @@ function main() {
         }
         let timeEntries = entry.getElementsByClassName(timeEntrySelector);
         if (timeEntries.length !== 2 && timeEntries.length !== 0) {
-            csvString += 'Day does not have exactly 2 entries\n';
+            htmlString += 'Day does not have exactly 2 entries\n';
             continue;
         }
         // console.log('Extracting entry', entry, date, timeEntries);
@@ -131,10 +118,11 @@ function main() {
 
         // csv format is
         // BEGIN, END, BREAK (Duration), BREAK TIME
-        csvString += `${beginning},${end},${breakDuration},${breakTime}\n`
+        htmlString += `<tr><td>${beginning}</td><td>${end}<td>${breakDuration}</td><td>${breakTime}</td></tr>`
     }
-    console.log(csvString);
-    copyTextToClipboard(csvString);
+    htmlString += '</tbody></table>'
+    console.log(htmlString);
+    copyHtmlToClipboard(htmlString);
 }
 
 function addWorkingButton() {
