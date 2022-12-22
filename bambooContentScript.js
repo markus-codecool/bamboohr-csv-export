@@ -86,7 +86,7 @@ function main() {
         }
         let timeEntries = entry.getElementsByClassName(timeEntrySelector);
         if (timeEntries.length !== 2 && timeEntries.length !== 0) {
-            htmlString += 'Day does not have exactly 2 entries\n';
+            htmlString += '<tr><td>Day does not have exactly 2 entries</td><td></td><td></td><td></td></tr>';
             continue;
         }
         // console.log('Extracting entry', entry, date, timeEntries);
