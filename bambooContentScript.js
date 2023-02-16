@@ -2,6 +2,7 @@ const payPeriodSelector = 'TimesheetSecondHeader__dates';
 
 const dailyEntrySelector = 'TimesheetSlat';
 const dateSelector = 'TimesheetSlat__dayDate';
+const dayOfWeekSelector = 'TimesheetSlat__dayOfWeek';
 const timeEntrySelector = 'TimeEntry';
 
 const timeEntryStartSelector = 'TimeEntry__start';
@@ -79,22 +80,35 @@ function main() {
     let htmlString = '<table><tbody>'; // This string is the result of this function
 
     let entries = document.getElementsByClassName(dailyEntrySelector);
+
+    let didHaveSat = false;
+    let didHaveSatEntry = false;
+
     for (let entry of entries) {
         let date = entry.getElementsByClassName(dateSelector)[0];
+
         if (!date.innerHTML.startsWith(payPeriodMonth)) {
             continue;
         }
+
         let timeEntries = entry.getElementsByClassName(timeEntrySelector);
         if (timeEntries.length !== 2 && timeEntries.length !== 0) {
             htmlString += '<tr><td>Day does not have exactly 2 entries</td><td></td><td></td><td></td></tr>';
             continue;
         }
+
         // console.log('Extracting entry', entry, date, timeEntries);
         let previous = undefined;
         let breakTime = '';
         let breakDuration = '';
         let beginning = '';
         let end = ''
+
+        const dayOfWeek = entry.getElementsByClassName(dayOfWeekSelector)[0].innerText.trim();
+        const isSaturday = dayOfWeek === 'Sat';
+        const isSunday = dayOfWeek === 'Sun';
+
+        didHaveSat ||= isSaturday;
 
         for (let timeEntry of timeEntries) {
             let timeEntryStart = timeEntry.getElementsByClassName(timeEntryStartSelector)[0].innerHTML;
@@ -106,6 +120,36 @@ function main() {
                 'duration': timeEntryTotal
             };
 
+            // NOTE: Special case, Saturdays get two entries in spreadsheet.
+            if (isSaturday) {
+                didHaveSatEntry = true;
+
+                if (!previous) {
+                    const BREAK_END = "13:00"
+                    const satBreakTime = `${currentEntry.end} - ${BREAK_END}`;
+                    const satBreakDuration = subtractTimes(BREAK_END, currentEntry.end);
+
+                    htmlString +=
+                        `<tr>
+                            <td>${currentEntry.start}</td>
+                            <td>${currentEntry.end}</td>
+                            <td>${satBreakDuration}</td>
+                            <td>${satBreakTime}</td>
+                        </tr>`.replace(/\s+/g, '');
+
+                    console.log({ satBreakTime, satBreakDuration });
+
+                    previous = currentEntry;
+                } else {
+                    beginning = currentEntry.start;
+                    end = currentEntry.end;
+                    breakTime = "";
+                    breakDuration = "";
+                }
+
+                continue;
+            }
+
             if (!!previous) {
                 breakTime = `${previous['end']} - ${currentEntry['start']}`;
                 breakDuration = subtractTimes(currentEntry['start'], previous['end']);
@@ -116,10 +160,26 @@ function main() {
             previous = currentEntry;
         }
 
+        if (isSunday && didHaveSat) {
+            if (!didHaveSatEntry) {
+                console.log("HERE");
+                htmlString += `<tr><td></td><td></td><td></td><td></td></tr>`;
+            }
+            didHaveSat = false;
+            didHaveSatEntry = false;
+        }
+
         // csv format is
         // BEGIN, END, BREAK (Duration), BREAK TIME
-        htmlString += `<tr><td>${beginning}</td><td>${end}<td>${breakDuration}</td><td>${breakTime}</td></tr>`
+        htmlString +=
+            `<tr>
+                <td>${beginning}</td>
+                <td>${end}</td>
+                <td>${breakDuration}</td>
+                <td>${breakTime}</td>
+            </tr>`.replace(/\s+/g, '');
     }
+
     htmlString += '</tbody></table>'
     console.log(htmlString);
     copyHtmlToClipboard(htmlString);
