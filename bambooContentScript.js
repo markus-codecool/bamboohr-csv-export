@@ -137,8 +137,6 @@ function main() {
                             <td>${satBreakTime}</td>
                         </tr>`.replace(/\s+/g, '');
 
-                    console.log({ satBreakTime, satBreakDuration });
-
                     previous = currentEntry;
                 } else {
                     beginning = currentEntry.start;
@@ -162,7 +160,6 @@ function main() {
 
         if (isSunday && didHaveSat) {
             if (!didHaveSatEntry) {
-                console.log("HERE");
                 htmlString += `<tr><td></td><td></td><td></td><td></td></tr>`;
             }
             didHaveSat = false;
