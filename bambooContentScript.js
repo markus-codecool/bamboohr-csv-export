@@ -144,18 +144,16 @@ function main() {
                     breakTime = "";
                     breakDuration = "";
                 }
-
-                continue;
-            }
-
-            if (!!previous) {
-                breakTime = `${previous['end']} - ${currentEntry['start']}`;
-                breakDuration = subtractTimes(currentEntry['start'], previous['end']);
             } else {
-                beginning = currentEntry['start'];
+                if (!!previous) {
+                    breakTime = `${previous['end']} - ${currentEntry['start']}`;
+                    breakDuration = subtractTimes(currentEntry['start'], previous['end']);
+                } else {
+                    beginning = currentEntry['start'];
+                }
+                end = currentEntry['end'];
+                previous = currentEntry;
             }
-            end = currentEntry['end'];
-            previous = currentEntry;
         }
 
         if (isSunday && didHaveSat) {
